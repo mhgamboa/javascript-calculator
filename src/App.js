@@ -31,14 +31,16 @@ class App extends React.Component {
   //Triggers when addition/division/multiplicaiton/subtraction is clicked
   handleOperator(e) {
     let regex = new RegExp(/[0-9]+[\+|x|\—|\/][0-9]+/, 'gi');
+    let operatorRegex = new RegExp(/[X|\/|\+|\-]/, 'i')
     let thereAreTwoNumbers = regex.test(this.state.display);
+    let thereIsAlreadyAnOperator = !operatorRegex.test(this.state.display);
 
     if (thereAreTwoNumbers) {
       this.calculateExpression()
       this.setState(state => ({
         display: state.display + e.target.innerText
       }))
-    } else {
+    } if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
       this.setState(state => ({
         display: `${this.state.display}${e.target.innerText}`
       }))
@@ -47,41 +49,37 @@ class App extends React.Component {
   }
 
   calculateExpression() {
-    console.log('CALCULATING');
-    //Splits display into an array around the operator
+    //Splits display into an array [numberOne, operator, numberTwo]
     let display = this.state.display.match(/\-*[0-9]+\.*[0-9]*|[|\+|\—|X|\/]|\-*[0-9]+\.*[0-9]*/gi);
-    console.log(display);
 
     let firstNumber = Number(display[0]);
     let operator = display[1]
     let secondNumber = Number(display[2]);
     let result;
 
+    //Bassed on the Operator calculate the function
     switch(operator) {
       case '+':
-        result = firstNumber + secondNumber;
+        result = (firstNumber + secondNumber).toFixed(2);
         break;
       case '—':
-        result = firstNumber - secondNumber;
+        result = (firstNumber - secondNumber).toFixed(2);
         break;
       case 'X':
-        result = firstNumber * secondNumber;
+        result = (firstNumber * secondNumber).toFixed(2);
         break;
       case '/':
-        result = firstNumber / secondNumber;
+        result = (firstNumber / secondNumber).toFixed(2);
+        break;
+      default:
+        result = this.state.display;
         break;
     }
-    result = result.toFixed(2); //Round number to two decimal places
 
     this.setState({
       display: result
     })
   }
-
-  //To debug
-  componentDidUpdate() {
-  }
-
 
   //Clears out all logic
   handleClear() {
@@ -96,10 +94,23 @@ class App extends React.Component {
     numberButtons.forEach((button) => {
       button.addEventListener("click", this.handleNumber);
     });
-    //Functionality for operator symbols(X,—,+,=)
+    //Add functionality for operator symbols(X,—,+,=)
     const operatorButtons = document.querySelectorAll(".operatorButton");
     operatorButtons.forEach((button) => {
       button.addEventListener("click", this.handleOperator);
+    });
+  }
+
+  componentWillUnmount() {
+    //Remove functionality for number buttons
+    const numberButtons = document.querySelectorAll(".numberButton");
+    numberButtons.forEach((button) => {
+      button.removeEventListener("click", this.handleNumber);
+    });
+    //Remove functionality for operator symbols(X,—,+,=)
+    const operatorButtons = document.querySelectorAll(".operatorButton");
+    operatorButtons.forEach((button) => {
+      button.removeEventListener("click", this.handleOperator);
     });
   }
 
