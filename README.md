@@ -1,2 +1,5 @@
 # javascript-calculator
- FCC Challenge
+
+FCC Challenge
+
+Made with Create-React-App
