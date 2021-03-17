@@ -11,6 +11,8 @@
   height: 100vh;
   width: 100vw;
 
+  background-color: #060026;
+
   padding: 20px;
 
   display: flex;
@@ -41,12 +43,17 @@
 .display {
   grid-area: display;
   border: solid gray 1px;
+  border-radius: 3px;
+
+  padding: 10px;
+
   display: grid;
   justify-content: end;
   align-content: center;
-  padding: 10px;
+
   font-weight: bold;
   font-size: 2rem;
+  color: white;
 }
 
 .gridItem {
@@ -55,13 +62,20 @@
   align-content: center;
 
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 
   cursor: pointer;
-  border: solid gray 1px;
+  color: white;
+  border-radius: 3px;
+
+  box-shadow: 0px 4px 5px black;
 }
 
 /* Numbers */
+.numberButton {
+  background-color: #242424;
+}
+
 #nine {
   grid-area: nine;
 }
@@ -107,6 +121,11 @@
 }
 
 /* Start Operators */
+
+.operatorButton {
+  background-color: #d62828;
+}
+
 #add {
   grid-area: add;
 }
@@ -126,8 +145,12 @@
 /* Clear And Equals */
 #clear {
   grid-area: ac;
+  background-color: #e5e5e5;
+  color: black;
 }
 
 #equals {
+  background-color: #f77f00;
   grid-area: equals;
+  font-size: 3rem;
 }
