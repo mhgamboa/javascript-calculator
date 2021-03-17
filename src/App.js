@@ -15,36 +15,49 @@ class App extends React.Component {
   
   //Adds inputed Numbers to display
   handleNumber(e) {
-    // If Display only shows 0 then erase 0 and show entered number
+    let decimalRegex = new RegExp(/\./, 'gi');
+    let regex = new RegExp(/[0-9]+[\+|x|\—|\/][0-9]+/, 'gi');
+    let operatorRegex = new RegExp(/[X|\/|\+|\—]/, 'i')
+    let pushedButton = e.target.innerText;
+    
     if (this.state.display === "0") {
+      // If Display only shows 0 then erase 0 and show entered number
       this.setState({
-        display: e.target.innerText
+        display: pushedButton
       });
-    } else {
-      //If display not zero add inputed text to current display
+    } else if (pushedButton != '.') {
+      //If display not zero & pushed button is a number add inputed text to current display
       this.setState((state, props) => ({
         display: `${this.state.display}${e.target.innerText}`
       }));
+    } else if (pushedButton == '.') {
+      
     }
   }
   
+
   //Triggers when addition/division/multiplicaiton/subtraction is clicked
   handleOperator(e) {
     let regex = new RegExp(/[0-9]+[\+|x|\—|\/][0-9]+/, 'gi');
-    let operatorRegex = new RegExp(/[X|\/|\+|\-]/, 'i')
+    let operatorRegex = new RegExp(/[X|\/|\+|\—]/, 'i')
     let thereAreTwoNumbers = regex.test(this.state.display);
-    let thereIsAlreadyAnOperator = !operatorRegex.test(this.state.display);
+    let thereIsAlreadyAnOperator = operatorRegex.test(this.state.display);
 
     if (thereAreTwoNumbers) {
       this.calculateExpression()
       this.setState(state => ({
         display: state.display + e.target.innerText
       }))
-    } if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
+    } if (!thereAreTwoNumbers && !thereIsAlreadyAnOperator) {
       this.setState(state => ({
         display: `${this.state.display}${e.target.innerText}`
-      }))
-      
+      })) 
+      //Change operation type if two operations pushed consecutively
+    } if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
+      let newDisplay = this.state.display.slice(0, -1);
+      this.setState(state => ({
+        display: `${newDisplay}${e.target.innerText}`
+      })) 
     }
   }
 
@@ -60,16 +73,16 @@ class App extends React.Component {
     //Bassed on the Operator calculate the function
     switch(operator) {
       case '+':
-        result = (firstNumber + secondNumber).toFixed(2);
+        result = (firstNumber + secondNumber);
         break;
       case '—':
-        result = (firstNumber - secondNumber).toFixed(2);
+        result = (firstNumber - secondNumber);
         break;
       case 'X':
-        result = (firstNumber * secondNumber).toFixed(2);
+        result = (firstNumber * secondNumber);
         break;
       case '/':
-        result = (firstNumber / secondNumber).toFixed(2);
+        result = (firstNumber / secondNumber);
         break;
       default:
         result = this.state.display;
