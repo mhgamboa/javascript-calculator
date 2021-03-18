@@ -5,7 +5,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      display: "0"
+      display: "924.8X77"
     };
     this.handleNumber = this.handleNumber.bind(this);
     this.handleClear = this.handleClear.bind(this);
@@ -26,12 +26,37 @@ class App extends React.Component {
         display: pushedButton
       });
     } else if (pushedButton != '.') {
-      //If display not zero & pushed button is a number add inputed text to current display
+      //If display not zero & pushed button is a number push inputed text to current display
       this.setState((state, props) => ({
         display: `${this.state.display}${e.target.innerText}`
       }));
+      //Functionality if Decimal is pushed
     } else if (pushedButton == '.') {
+      let operatorRegex = new RegExp(/[X|\/|\+|\—]/, 'i');
+      let weAreOnTheFirstNumber = !operatorRegex.test(this.state.display);
       
+      let decimalRegex = new RegExp(/\./, 'i');
+      let firstNumberHasDecimal = decimalRegex.test(this.state.display);
+
+      //If there is only one number, then only add the decimal to the display if there are no decimals
+      if (weAreOnTheFirstNumber) {
+        if (!firstNumberHasDecimal) {
+          this.setState((state, props) => ({
+            display: `${this.state.display}${e.target.innerText}`
+          }));
+        }
+        //If we're on the 2nd number check the 2nd number & see if there is a decimal & add it if needed
+      } else if (!weAreOnTheFirstNumber) {
+        let operatorPosition = this.state.display.match(operatorRegex).index;
+        let secondNumber = this.state.display.slice(operatorPosition + 1);
+        let secondNumberHasDecimal = decimalRegex.test(secondNumber);
+
+        if (!secondNumberHasDecimal) {
+          this.setState((state, props) => ({
+            display: `${this.state.display}${e.target.innerText}`
+          }));
+        }
+      }
     }
   }
   
