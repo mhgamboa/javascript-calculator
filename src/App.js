@@ -115,7 +115,6 @@ class App extends React.Component {
     let result;
     if (thereAreTwoOperators) {
       display = this.state.display.match(/\-*[0-9]+\.*[0-9]*|[|\+|X|\/]|\—*[0-9]+\.*[0-9]*/gi);
-      console.log(display);
       firstNumber = Number(display[0]);
       operator = display[1]
       secondNumber = Number(display[2].replace('—', '-'));
