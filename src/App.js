@@ -5,7 +5,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      display: "924.8X77"
+      display: "0"
     };
     this.handleNumber = this.handleNumber.bind(this);
     this.handleClear = this.handleClear.bind(this);
@@ -63,60 +63,91 @@ class App extends React.Component {
 
   //Triggers when addition/division/multiplicaiton/subtraction is clicked
   handleOperator(e) {
+    let pushedButton = e.target.innerText;
+
     let regex = new RegExp(/[0-9]+[\+|x|\—|\/][0-9]+/, 'gi');
-    let operatorRegex = new RegExp(/[X|\/|\+|\—]/, 'i')
     let thereAreTwoNumbers = regex.test(this.state.display);
+
+    let operatorRegex = new RegExp(/[X|\/|\+|\—]/, 'i')
     let thereIsAlreadyAnOperator = operatorRegex.test(this.state.display);
+    
+    let twoOperatorsRegex = new RegExp(/[X|\/|\+|\—]\—/, 'i')
+    let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
 
     if (thereAreTwoNumbers) {
       this.calculateExpression()
       this.setState(state => ({
-        display: state.display + e.target.innerText
+        display: state.display + pushedButton
       }))
     } if (!thereAreTwoNumbers && !thereIsAlreadyAnOperator) {
       this.setState(state => ({
-        display: `${this.state.display}${e.target.innerText}`
+        display: `${this.state.display}${pushedButton}`
       })) 
-      //Change operation type if two operations pushed consecutively
+      //Handle operation type if two operations pushed consecutively
     } if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
-      let newDisplay = this.state.display.slice(0, -1);
-      this.setState(state => ({
-        display: `${newDisplay}${e.target.innerText}`
-      })) 
+      //Functionality if '—' is pressed
+      if (pushedButton === '—') {
+        //If there's only one operator add the '—' which will make the number negative
+        if (!thereAreTwoOperators) {
+          this.setState(state => ({
+            display: `${this.state.display}${pushedButton}`
+          })) 
+        }
+        } else if (thereAreTwoOperators) { //If any other operator symbol is pressed replace the two existing operators
+        let newDisplay = this.state.display.slice(0, -2);
+        this.setState(state => ({
+          display: `${newDisplay}${pushedButton}`
+        })) 
+      } 
     }
+      
   }
 
   calculateExpression() {
-    //Splits display into an array [numberOne, operator, numberTwo]
-    let display = this.state.display.match(/\-*[0-9]+\.*[0-9]*|[|\+|\—|X|\/]|\-*[0-9]+\.*[0-9]*/gi);
-
-    let firstNumber = Number(display[0]);
-    let operator = display[1]
-    let secondNumber = Number(display[2]);
+    let twoOperatorsRegex = new RegExp(/[X|\/|\+|\—]\—/, 'i')
+    let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
+    
+    // Split display in to three items: number one, Operator symbolnumber two
+    let display;
+    let firstNumber;
+    let operator;
+    let secondNumber;
     let result;
-
-    //Bassed on the Operator calculate the function
-    switch(operator) {
-      case '+':
-        result = (firstNumber + secondNumber);
-        break;
-      case '—':
-        result = (firstNumber - secondNumber);
-        break;
-      case 'X':
-        result = (firstNumber * secondNumber);
-        break;
-      case '/':
-        result = (firstNumber / secondNumber);
-        break;
-      default:
-        result = this.state.display;
-        break;
+    if (thereAreTwoOperators) {
+      display = this.state.display.match(/\-*[0-9]+\.*[0-9]*|[|\+|X|\/]|\—*[0-9]+\.*[0-9]*/gi);
+      console.log(display);
+      firstNumber = Number(display[0]);
+      operator = display[1]
+      secondNumber = Number(display[2].replace('—', '-'));
+    } else if (!thereAreTwoOperators) {
+      display = this.state.display.match(/\-*[0-9]+\.*[0-9]*|[|\+|\—|X|\/]|[0-9]+\.*[0-9]*/gi);
+      firstNumber = Number(display[0]);
+      operator = display[1]
+      secondNumber = Number(display[2]);
     }
-
-    this.setState({
-      display: result
-    })
+      //Bassed on the Operator calculate the function
+      switch(operator) {
+        case '+':
+          result = (firstNumber + secondNumber);
+          break;
+        case '—':
+          result = (firstNumber - secondNumber);
+          break;
+        case 'X':
+          result = (firstNumber * secondNumber);
+          break;
+        case '/':
+          result = (firstNumber / secondNumber);
+          break;
+        default:
+          result = this.state.display;
+          break;
+      }
+  
+      this.setState({
+        display: result
+      })
+    
   }
 
   //Clears out all logic
