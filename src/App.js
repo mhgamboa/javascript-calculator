@@ -72,6 +72,11 @@ class App extends React.Component {
     let twoOperatorsRegex = new RegExp(/[\*|\/|\+|\-]\-/, "i");
     let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
 
+    let firstNumberNegativeRegex = new RegExp(/^\-/);
+    let firstNumberIsNegative = firstNumberNegativeRegex.test(
+      this.state.display
+    );
+
     if (thereAreTwoNumbers) {
       this.calculateExpression();
       this.setState((state) => ({
@@ -85,6 +90,11 @@ class App extends React.Component {
       //Handle operation type if two operations pushed consecutively
     }
     if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
+      if (firstNumberIsNegative) {
+        this.setState((state) => ({
+          display: `${this.state.display}${pushedButton}`,
+        }));
+      }
       //Functionality if '-' is pressed
       if (pushedButton === "-") {
         //If there's only one operator add the '-' which will make the number negative
