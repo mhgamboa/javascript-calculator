@@ -164,3 +164,8 @@
   grid-area: equals;
   font-size: 3rem;
 }
+
+.gridItem:hover {
+  background: rgb(255, 162, 177);
+  transition: 300ms;
+}

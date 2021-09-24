@@ -77,6 +77,9 @@ class App extends React.Component {
       this.state.display
     );
 
+    let endsWithNegativeRegex = new RegExp(/-$/);
+    let endsWithNegative = endsWithNegativeRegex.test(this.state.display);
+
     if (thereAreTwoNumbers) {
       this.calculateExpression();
       this.setState((state) => ({
@@ -98,7 +101,7 @@ class App extends React.Component {
       //Functionality if '-' is pressed
       if (pushedButton === "-") {
         //If there's only one operator add the '-' which will make the number negative
-        if (!thereAreTwoOperators) {
+        if (!thereAreTwoOperators && !endsWithNegative) {
           this.setState((state) => ({
             display: `${this.state.display}${pushedButton}`,
           }));
