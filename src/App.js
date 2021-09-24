@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
 
+import { evaluate } from "mathjs";
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -15,9 +17,6 @@ class App extends React.Component {
 
   //Adds inputed Numbers to display
   handleNumber(e) {
-    let decimalRegex = new RegExp(/\./, "gi");
-    let regex = new RegExp(/[0-9]+[\+|x|\–|\/][0-9]+/, "gi");
-    let operatorRegex = new RegExp(/[X|\/|\+|\–]/, "i");
     let pushedButton = e.target.innerText;
 
     if (this.state.display === "0") {
@@ -32,7 +31,7 @@ class App extends React.Component {
       }));
       //Functionality if Decimal is pushed
     } else if (pushedButton == ".") {
-      let operatorRegex = new RegExp(/[X|\/|\+|\–]/, "i");
+      let operatorRegex = new RegExp(/[\*|\/|\+|\-]/, "i");
       let weAreOnTheFirstNumber = !operatorRegex.test(this.state.display);
 
       let decimalRegex = new RegExp(/\./, "i");
@@ -64,13 +63,13 @@ class App extends React.Component {
   handleOperator(e) {
     let pushedButton = e.target.innerText;
 
-    let regex = new RegExp(/[0-9]+[\+|x|\–|\/][0-9]+/, "gi");
+    let regex = new RegExp(/[0-9]+[\+|\*|\-|\/][0-9]+/, "gi");
     let thereAreTwoNumbers = regex.test(this.state.display);
 
-    let operatorRegex = new RegExp(/[X|\/|\+|\–]/, "i");
+    let operatorRegex = new RegExp(/[\*|\/|\+|\-]/, "i");
     let thereIsAlreadyAnOperator = operatorRegex.test(this.state.display);
 
-    let twoOperatorsRegex = new RegExp(/[X|\/|\+|\–]\–/, "i");
+    let twoOperatorsRegex = new RegExp(/[\*|\/|\+|\-]\-/, "i");
     let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
 
     if (thereAreTwoNumbers) {
@@ -86,9 +85,9 @@ class App extends React.Component {
       //Handle operation type if two operations pushed consecutively
     }
     if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
-      //Functionality if '–' is pressed
-      if (pushedButton === "–") {
-        //If there's only one operator add the '–' which will make the number negative
+      //Functionality if '-' is pressed
+      if (pushedButton === "-") {
+        //If there's only one operator add the '-' which will make the number negative
         if (!thereAreTwoOperators) {
           this.setState((state) => ({
             display: `${this.state.display}${pushedButton}`,
@@ -105,48 +104,7 @@ class App extends React.Component {
   }
 
   calculateExpression() {
-    let twoOperatorsRegex = new RegExp(/[X|\/|\+|\–]\–/, "i");
-    let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
-
-    // Split display in to three items: number one, Operator symbolnumber two
-    let display;
-    let firstNumber;
-    let operator;
-    let secondNumber;
-    let result;
-    if (thereAreTwoOperators) {
-      display = this.state.display.match(
-        /\-*[0-9]+\.*[0-9]*|[|\+|X|\/]|\–*[0-9]+\.*[0-9]*/gi
-      );
-      firstNumber = Number(display[0]);
-      operator = display[1];
-      secondNumber = Number(display[2].replace("–", "-"));
-    } else if (!thereAreTwoOperators) {
-      display = this.state.display.match(
-        /\-*[0-9]+\.*[0-9]*|[|\+|\–|X|\/]|[0-9]+\.*[0-9]*/gi
-      );
-      firstNumber = Number(display[0]);
-      operator = display[1];
-      secondNumber = Number(display[2]);
-    }
-    //Bassed on the Operator calculate the function
-    switch (operator) {
-      case "+":
-        result = firstNumber + secondNumber;
-        break;
-      case "–":
-        result = firstNumber - secondNumber;
-        break;
-      case "X":
-        result = firstNumber * secondNumber;
-        break;
-      case "/":
-        result = firstNumber / secondNumber;
-        break;
-      default:
-        result = this.state.display;
-        break;
-    }
+    let result = evaluate(this.state.display);
 
     this.setState({
       display: result,
@@ -166,7 +124,7 @@ class App extends React.Component {
     numberButtons.forEach((button) => {
       button.addEventListener("click", this.handleNumber);
     });
-    //Add functionality for operator symbols(X,–,+,=)
+    //Add functionality for operator symbols(\*,-,+,=)
     const operatorButtons = document.querySelectorAll(".operatorButton");
     operatorButtons.forEach((button) => {
       button.addEventListener("click", this.handleOperator);
@@ -179,7 +137,7 @@ class App extends React.Component {
     numberButtons.forEach((button) => {
       button.removeEventListener("click", this.handleNumber);
     });
-    //Remove functionality for operator symbols(X,–,+,=)
+    //Remove functionality for operator symbols(\*,-,+,=)
     const operatorButtons = document.querySelectorAll(".operatorButton");
     operatorButtons.forEach((button) => {
       button.removeEventListener("click", this.handleOperator);
@@ -202,10 +160,10 @@ class App extends React.Component {
             /
           </div>
           <div id="multiply" className="gridItem operatorButton">
-            X
+            *
           </div>
           <div id="subtract" className="gridItem operatorButton">
-            –
+            -
           </div>
           <div id="add" className="gridItem operatorButton">
             +
