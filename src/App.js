@@ -24,13 +24,13 @@ class App extends React.Component {
       this.setState({
         display: pushedButton,
       });
-    } else if (pushedButton != ".") {
+    } else if (pushedButton !== ".") {
       //If display not zero & pushed button is a number push inputed text to current display
       this.setState((state, props) => ({
         display: `${this.state.display}${e.target.innerText}`,
       }));
       //Functionality if Decimal is pushed
-    } else if (pushedButton == ".") {
+    } else if (pushedButton === ".") {
       let operatorRegex = new RegExp(/[\*|\/|\+|\-]/, "i");
       let weAreOnTheFirstNumber = !operatorRegex.test(this.state.display);
 
@@ -63,62 +63,53 @@ class App extends React.Component {
   handleOperator(e) {
     let pushedButton = e.target.innerText;
 
-    let regex = new RegExp(/[0-9]+[\+|\*|\-|\/][0-9]+/, "gi");
-    let thereAreTwoNumbers = regex.test(this.state.display);
-
-    let operatorRegex = new RegExp(/[\*|\/|\+|\-]/, "i");
-    let thereIsAlreadyAnOperator = operatorRegex.test(this.state.display);
-
-    let twoOperatorsRegex = new RegExp(/[\*|\/|\+|\-]\-/, "i");
-    let thereAreTwoOperators = twoOperatorsRegex.test(this.state.display);
-
-    let firstNumberNegativeRegex = new RegExp(/^\-/);
-    let firstNumberIsNegative = firstNumberNegativeRegex.test(
-      this.state.display
+    let operationDoneReg = new RegExp(
+      /^-*[0-9]*\.*[0-9]*[\+|\-|\/|\*|]-*[0-9]*\.*[0-9]*$/,
+      "gi"
     );
+    let operationIsCompleted = operationDoneReg.test(this.state.display);
 
-    let endsWithNegativeRegex = new RegExp(/-$/);
-    let endsWithNegative = endsWithNegativeRegex.test(this.state.display);
+    let oneNumberNoSymbolsReg = new RegExp(/^-*[0-9]*\.*[0-9]*$/, "gi");
+    let oneNumberNoSymbol = oneNumberNoSymbolsReg.test(this.state.display);
 
-    if (thereAreTwoNumbers) {
+    let oneNumOneSymReg = new RegExp(/^-*[0-9]*\.*[0-9]*[\+|\-|\/|\*|]$/, "gi");
+    let oneNumberOneSymbol = oneNumOneSymReg.test(this.state.display);
+
+    let oneNum2SymReg = new RegExp(/^-*[0-9]*\.*[0-9]*[\+|\-|\/|\*|]-$/, "gi");
+    let oneNumberTwoSymbols = oneNum2SymReg.test(this.state.display);
+
+    if (oneNumberNoSymbol) {
+      this.setState((state) => ({
+        display: `${this.state.display}${pushedButton}`,
+      }));
+    }
+
+    if (oneNumberOneSymbol) {
+      if (pushedButton === "-") {
+        this.setState((state) => ({
+          display: `${this.state.display}${pushedButton}`,
+        }));
+      } else {
+        let newDisplay = this.state.display.slice(0, -1);
+        this.setState((state) => ({
+          display: `${newDisplay}${pushedButton}`,
+        }));
+      }
+    } else if (oneNumberTwoSymbols) {
+      let newDisplay = this.state.display.slice(0, -2);
+      this.setState((state) => ({
+        display: `${newDisplay}${pushedButton}`,
+      }));
+    } else if (operationIsCompleted) {
       this.calculateExpression();
       this.setState((state) => ({
         display: state.display + pushedButton,
       }));
     }
-    if (!thereAreTwoNumbers && !thereIsAlreadyAnOperator) {
-      this.setState((state) => ({
-        display: `${this.state.display}${pushedButton}`,
-      }));
-      //Handle operation type if two operations pushed consecutively
-    }
-    if (!thereAreTwoNumbers && thereIsAlreadyAnOperator) {
-      if (firstNumberIsNegative) {
-        this.setState((state) => ({
-          display: `${this.state.display}${pushedButton}`,
-        }));
-      }
-      //Functionality if '-' is pressed
-      if (pushedButton === "-") {
-        //If there's only one operator add the '-' which will make the number negative
-        if (!thereAreTwoOperators && !endsWithNegative) {
-          this.setState((state) => ({
-            display: `${this.state.display}${pushedButton}`,
-          }));
-        }
-      } else if (thereAreTwoOperators) {
-        //If any other operator symbol is pressed replace the two existing operators
-        let newDisplay = this.state.display.slice(0, -2);
-        this.setState((state) => ({
-          display: `${newDisplay}${pushedButton}`,
-        }));
-      }
-    }
   }
 
   calculateExpression() {
     let result = evaluate(this.state.display);
-
     this.setState({
       display: result,
     });
